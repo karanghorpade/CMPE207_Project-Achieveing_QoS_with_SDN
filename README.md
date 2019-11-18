@@ -34,3 +34,77 @@ For this project we have created a custom topology.
 This topology includes 2 Switches, 3 Hosts and 1 Controller.
 
 ![](images/Untitled%20Diagram.png)
+
+Steps to follow:
+
+Set up SSH connection with the mininet VM from your local machine
+
+Start the mininet VM
+
+scp all the files in the projects 'python' folder into the 'mininet' directory of your mininet VM 
+
+Mac users start the XQuartz once the mininet VM is up and running
+
+Open three Terminal windows with XQuartz
+
+SSH into the mininet from all the three terminal windows
+
+In one of the terminal window type command 'cd mininet'
+
+To start the custom topology use command 'sudo python topo2s3h.py'
+
+This will start the topology
+
+Type command 'pingall'
+
+The hosts won't be able to ping each other as the switches don't have the forwarding information to route the packets
+
+Type command 'exit' to stop the topology
+
+Use command 'sudo mn -c' to clear any saved data
+
+Now in the second terminal window type 'cd pox'
+
+Then type the following command
+'python pox.py log.level --DEBUG forwarding.l2_learning'
+
+This will start the l2_learning switch
+
+A layer 2 switch is a type of network switch or device that works on the data link layer (OSI Layer 2) and utilizes MAC Address to determine the path through where the frames are to be forwarded. It uses hardware based switching techniques to connect and transmit data in a local area network (LAN).
+
+A layer 2 switch can also be referred to as a multiport bridge.
+
+This allows the switches to have the forwarding information about each host inside the network.
+
+Now follow the steps given above to start the topology again
+
+perform pingall and the hosts will be able to ping each other
+
+In the same window open the xterm for h1 h2 and h3
+type 'xterm h1 h2 h3'
+
+In window for h1 perform 'iperf -s'
+
+In window for h2 perform 'iperf -c 10.0.0.1 -r'
+
+Observe the traffic and bandwidth
+
+Now we will apply the single QoS Queue.
+
+In the third window opened initially run the 'qos1.py' script 'sudo python qos1.py'
+
+This script will create single QoS with a single Queue (q0) on port s1-eth1
+
+This will throttle all egress traffic (going out) on that port
+
+The port s1-eth1 is the switch port linked to h1. 
+Running iperf with h1 server, h2 client:
+h2 → h1 (client to server) throttled to 4Mbit/s 
+h1 → h2 (server to client) not throttled
+This QoS is egress only i.e. when the switch is forwarding packets towards h1.
+A side effect of this appears to be a reduction in the incoming bandwidth on that port, reduced almost by a third.
+This is entirely a result of the bottleneck in the virtualised switch processing; later, a reduction in the link bandwidth is shown to relieve this bottleneck.
+
+Now in the same terminal window as before run the script 'sudo python qos2.py'
+
+Instead of applying QoS on queue 0 (default) on port s1-eth1, we will create two queues, one on which we enqueue traffic we want to pass unrestricted (at maximim bandwidth 1Gbit/s) and one on which we enqueue the traffic we want throttled to 4Mbit/s
