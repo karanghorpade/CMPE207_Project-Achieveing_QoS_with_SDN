@@ -61,7 +61,7 @@ The hosts won't be able to ping each other as the switches don't have the forwar
 
 Type command 'exit' to stop the topology
 
-Use command 'sudo mn -c' to clear any saved data
+Use command 'sudo mn -c' to clear the previous emulation
 
 Now in the second terminal window type 'cd pox'
 
